@@ -33,7 +33,7 @@ dns.setServers(['8.8.8.8', '1.1.1.1']);
 console.log('DNS servers set to:', dns.getServers());
 
 mongoose
-  .connect("mongodb+srv://pawarkrish99_db_user:AEwhf2BvSL11pLw8@book-management-api.oxvqfdo.mongodb.net/Book")
+  .connect(process.env.MONGODB_URI)
   .then(() => {
     console.log("✅ MongoDB Connected");
 
