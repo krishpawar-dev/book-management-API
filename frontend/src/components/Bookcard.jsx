@@ -34,7 +34,7 @@ function BookCard({ book, onDelete }) {
             <div className="book-cover-wrap">
                 {book.image ? (
                     <img
-                        src={`${API_URL}/uploads/books/${book.image}`}
+                        src={book.image}
                         alt={book.title}
                         className="book-image"
                     />

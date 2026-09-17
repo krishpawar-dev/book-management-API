@@ -1,4 +1,26 @@
 const Book = require("../models/BookUser");
+const cloudinary = require("../config/cloudinary");
+const streamifier = require("streamifier");
+
+const uploadToCloudinary = (buffer) => {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            {
+                folder: "book-management/books",
+                resource_type: "image"
+            },
+            (error, result) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(result);
+                }
+            }
+        );
+
+        streamifier.createReadStream(buffer).pipe(stream);
+    });
+};
 
 const AddBook = async (req, res) => {
     try {
@@ -17,13 +39,15 @@ const AddBook = async (req, res) => {
             });
         }
 
+        const result = await uploadToCloudinary(req.file.buffer);
+
         const book = await Book.create({
             title,
             author,
             category,
             price,
             description,
-            image: req.file.filename,
+            image: result.secure_url,
             createdBy: req.user.userId,
         });
 
@@ -127,7 +151,8 @@ const UpdateBook = async (req, res) => {
         book.description = description || book.description;
 
         if (req.file) {
-            book.image = req.file.filename;
+            const result = await uploadToCloudinary(req.file.buffer);
+            book.image = result.secure_url;
         }
 
         await book.save();
